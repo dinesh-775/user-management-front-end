@@ -4,20 +4,16 @@ function UsersList() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // 🔥 GET USERS
   const fetchUsers = async () => {
     try {
-      const res = await fetch("try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/user-api/user`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-/user-api/users");
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/user-api/users`
+      );
+
       const data = await res.json();
 
-      setUsers(data.payload);
+      setUsers(data.payload || []);
       setLoading(false);
     } catch (error) {
       console.log("Error fetching users:", error);
@@ -25,22 +21,33 @@ function UsersList() {
     }
   };
 
+  // 🔥 DELETE USER
   const deleteUser = async (id) => {
-  try {
-    await fetch(`http://localhost:4000/user-api/users/${id}`, {
-      method: "DELETE",
-    });
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/user-api/users/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
 
-    fetchUsers(); // refresh list
-  } catch (error) {
-    console.log(error);
-  }
-};
+      const data = await res.json();
+
+      if (res.ok) {
+        alert("User deleted successfully");
+        fetchUsers(); // refresh list
+      } else {
+        alert(data.message || "Failed to delete user");
+      }
+    } catch (error) {
+      console.log("Delete error:", error);
+      alert("Server error");
+    }
+  };
 
   useEffect(() => {
     fetchUsers();
   }, []);
-  
 
   return (
     <div className="min-h-screen bg-gray-950 text-white p-10">
@@ -55,9 +62,9 @@ function UsersList() {
         <p className="text-center text-gray-500">No users found</p>
       ) : (
         <div className="grid md:grid-cols-3 gap-6">
-          {users.map((user, index) => (
+          {users.map((user) => (
             <div
-              key={index}
+              key={user._id}
               className="bg-gray-900 border border-gray-800 rounded-xl p-5 hover:bg-gray-800 transition"
             >
               <h2 className="text-xl font-semibold mb-2">
@@ -71,12 +78,17 @@ function UsersList() {
               <p className="text-gray-400 text-sm mt-1">
                 📱 {user.mobilenumber}
               </p>
-              <button onClick={() => deleteUser(user._id)}
-                className="mt-4 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm"
-                >
-                    Delete
-              </button>
 
+              <p className="text-gray-500 text-xs mt-1">
+                DOB: {user.dateofbirth}
+              </p>
+
+              <button
+                onClick={() => deleteUser(user._id)}
+                className="mt-4 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm"
+              >
+                Delete
+              </button>
             </div>
           ))}
         </div>
