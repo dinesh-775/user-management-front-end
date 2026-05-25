@@ -17,7 +17,6 @@ function UsersList() {
 
       console.log("API RESPONSE:", data);
 
-      // SAFE HANDLING (works for all response types)
       const usersData =
         data?.payload ||
         data?.users ||
@@ -77,6 +76,7 @@ function UsersList() {
         </p>
       ) : (
         <div className="grid md:grid-cols-3 gap-6">
+
           {users.map((user) => (
             <div
               key={user._id}
@@ -87,15 +87,15 @@ function UsersList() {
               </h2>
 
               <p className="text-gray-400 text-sm">
-                 {user.email}
+                📧 {user.email}
               </p>
 
               <p className="text-gray-400 text-sm mt-1">
-                 {user.mobilenumber}
+                📱 {String(user.mobilenumber)}
               </p>
 
               <p className="text-gray-500 text-xs mt-1">
-                DOB: {user.dateofbirth}
+                🎂 {user.dateofbirth || "N/A"}
               </p>
 
               <button
@@ -106,6 +106,7 @@ function UsersList() {
               </button>
             </div>
           ))}
+
         </div>
       )}
     </div>
