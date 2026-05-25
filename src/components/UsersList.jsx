@@ -60,10 +60,14 @@ function UsersList() {
     fetchUsers();
   }, []);
 
-  // 🔍 FILTER USERS BY NAME
-  const filteredUsers = users.filter((user) =>
-    user.name.toLowerCase().includes(search.toLowerCase())
-  );
+  // 🔍 STARTS-WITH SEARCH FILTER
+  const filteredUsers = users.filter((user) => {
+    if (!search.trim()) return true;
+
+    return user.name
+      .toLowerCase()
+      .startsWith(search.toLowerCase());
+  });
 
   return (
     <div className="min-h-screen bg-gray-950 text-white p-10">
@@ -72,7 +76,7 @@ function UsersList() {
         Users List
       </h1>
 
-      {/* 🔍 SEARCH BAR */}
+      {/* SEARCH BAR */}
       <div className="flex justify-center mb-8">
         <input
           type="text"
