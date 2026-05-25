@@ -4,24 +4,35 @@ function UsersList() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  //  GET USERS
+  // GET USERS
   const fetchUsers = async () => {
     try {
+      setLoading(true);
+
       const res = await fetch(
         `${import.meta.env.VITE_API_URL}/user-api/users`
       );
 
       const data = await res.json();
 
-      setUsers(data.payload || []);
-      setLoading(false);
+      console.log("API RESPONSE:", data);
+
+      // SAFE HANDLING (works for all response types)
+      const usersData =
+        data?.payload ||
+        data?.users ||
+        (Array.isArray(data) ? data : []);
+
+      setUsers(usersData);
     } catch (error) {
       console.log("Error fetching users:", error);
+      setUsers([]);
+    } finally {
       setLoading(false);
     }
   };
 
-  //  DELETE USER
+  // DELETE USER
   const deleteUser = async (id) => {
     try {
       const res = await fetch(
@@ -57,9 +68,13 @@ function UsersList() {
       </h1>
 
       {loading ? (
-        <p className="text-center text-gray-400">Loading users...</p>
+        <p className="text-center text-gray-400">
+          Loading users...
+        </p>
       ) : users.length === 0 ? (
-        <p className="text-center text-gray-500">No users found</p>
+        <p className="text-center text-gray-500">
+          No users found
+        </p>
       ) : (
         <div className="grid md:grid-cols-3 gap-6">
           {users.map((user) => (
