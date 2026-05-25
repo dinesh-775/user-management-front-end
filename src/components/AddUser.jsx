@@ -55,7 +55,7 @@ function AddUser() {
     if (!validate()) return;
 
     try {
-      const res = await fetch("http://localhost:4000/user-api/user", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/user-api/user`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
