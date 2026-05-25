@@ -3,7 +3,21 @@ import { useEffect, useState } from "react";
 function UsersList() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
+
+  // 🔥 TOAST STATE
+  const [toast, setToast] = useState({
+    show: false,
+    message: "",
+    type: "",
+  });
+
+  const showToast = (message, type) => {
+    setToast({ show: true, message, type });
+
+    setTimeout(() => {
+      setToast({ show: false, message: "", type: "" });
+    }, 3000);
+  };
 
   // GET USERS
   const fetchUsers = async () => {
@@ -16,8 +30,6 @@ function UsersList() {
 
       const data = await res.json();
 
-      console.log("API RESPONSE:", data);
-
       const usersData =
         data?.payload ||
         data?.users ||
@@ -25,7 +37,7 @@ function UsersList() {
 
       setUsers(usersData);
     } catch (error) {
-      console.log("Error fetching users:", error);
+      console.log(error);
       setUsers([]);
     } finally {
       setLoading(false);
@@ -45,14 +57,14 @@ function UsersList() {
       const data = await res.json();
 
       if (res.ok) {
-        alert("User deleted successfully");
+        showToast("User deleted successfully 🗑️", "success");
         fetchUsers();
       } else {
-        alert(data.message || "Failed to delete user");
+        showToast(data.message || "Delete failed", "error");
       }
     } catch (error) {
-      console.log("Delete error:", error);
-      alert("Server error");
+      console.log(error);
+      showToast("Server error", "error");
     }
   };
 
@@ -60,45 +72,35 @@ function UsersList() {
     fetchUsers();
   }, []);
 
-  // 🔍 STARTS-WITH SEARCH FILTER
-  const filteredUsers = users.filter((user) => {
-    if (!search.trim()) return true;
-
-    return user.name
-      .toLowerCase()
-      .startsWith(search.toLowerCase());
-  });
-
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-10">
+    <div className="min-h-screen bg-gray-950 text-white p-10 relative">
 
-      <h1 className="text-3xl font-bold mb-6 text-center">
+      <h1 className="text-3xl font-bold mb-8 text-center">
         Users List
       </h1>
 
-      {/* SEARCH BAR */}
-      <div className="flex justify-center mb-8">
-        <input
-          type="text"
-          placeholder="Search user by name..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full max-w-md px-4 py-2 rounded-md bg-gray-800 border border-gray-700 text-white focus:outline-none focus:border-blue-500"
-        />
-      </div>
+      {/* 🔥 HOTDOG TOAST */}
+      {toast.show && (
+        <div
+          className={`fixed top-5 right-5 px-5 py-3 rounded-md text-white shadow-lg transition-all duration-300
+          ${toast.type === "success" ? "bg-green-600" : "bg-red-600"}`}
+        >
+          {toast.message}
+        </div>
+      )}
 
       {loading ? (
         <p className="text-center text-gray-400">
           Loading users...
         </p>
-      ) : filteredUsers.length === 0 ? (
+      ) : users.length === 0 ? (
         <p className="text-center text-gray-500">
           No users found
         </p>
       ) : (
         <div className="grid md:grid-cols-3 gap-6">
 
-          {filteredUsers.map((user) => (
+          {users.map((user) => (
             <div
               key={user._id}
               className="bg-gray-900 border border-gray-800 rounded-xl p-5 hover:bg-gray-800 transition"
