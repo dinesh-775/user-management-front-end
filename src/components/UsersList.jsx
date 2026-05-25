@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 function UsersList() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
 
   // GET USERS
   const fetchUsers = async () => {
@@ -45,7 +46,7 @@ function UsersList() {
 
       if (res.ok) {
         alert("User deleted successfully");
-        fetchUsers(); // refresh list
+        fetchUsers();
       } else {
         alert(data.message || "Failed to delete user");
       }
@@ -59,25 +60,41 @@ function UsersList() {
     fetchUsers();
   }, []);
 
+  // 🔍 FILTER USERS BY NAME
+  const filteredUsers = users.filter((user) =>
+    user.name.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <div className="min-h-screen bg-gray-950 text-white p-10">
 
-      <h1 className="text-3xl font-bold mb-8 text-center">
+      <h1 className="text-3xl font-bold mb-6 text-center">
         Users List
       </h1>
+
+      {/* 🔍 SEARCH BAR */}
+      <div className="flex justify-center mb-8">
+        <input
+          type="text"
+          placeholder="Search user by name..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full max-w-md px-4 py-2 rounded-md bg-gray-800 border border-gray-700 text-white focus:outline-none focus:border-blue-500"
+        />
+      </div>
 
       {loading ? (
         <p className="text-center text-gray-400">
           Loading users...
         </p>
-      ) : users.length === 0 ? (
+      ) : filteredUsers.length === 0 ? (
         <p className="text-center text-gray-500">
           No users found
         </p>
       ) : (
         <div className="grid md:grid-cols-3 gap-6">
 
-          {users.map((user) => (
+          {filteredUsers.map((user) => (
             <div
               key={user._id}
               className="bg-gray-900 border border-gray-800 rounded-xl p-5 hover:bg-gray-800 transition"
@@ -92,10 +109,6 @@ function UsersList() {
 
               <p className="text-gray-400 text-sm mt-1">
                 📱 {String(user.mobilenumber)}
-              </p>
-
-              <p className="text-gray-500 text-xs mt-1">
-                🎂 {user.dateofbirth || "N/A"}
               </p>
 
               <button
