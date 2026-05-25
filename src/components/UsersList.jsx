@@ -6,7 +6,15 @@ function UsersList() {
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch("http://localhost:4000/user-api/users");
+      const res = await fetch("try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/user-api/user`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+/user-api/users");
       const data = await res.json();
 
       setUsers(data.payload);
