@@ -8,65 +8,43 @@ function AddUser() {
     dateofbirth: "",
   });
 
-  const [errors, setErrors] = useState({});
+  const [toast, setToast] = useState({
+    show: false,
+    message: "",
+    type: "",
+  });
+
+  const showToast = (message, type) => {
+    setToast({ show: true, message, type });
+
+    setTimeout(() => {
+      setToast({ show: false, message: "", type: "" });
+    }, 3000);
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const validate = () => {
-    let newErrors = {};
-
-    // Name
-    if (!formData.name.trim()) {
-      newErrors.name = "Name is required";
-    }
-
-    // Email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!formData.email) {
-      newErrors.email = "Email is required";
-    } else if (!emailRegex.test(formData.email)) {
-      newErrors.email = "Enter a valid email";
-    }
-
-    // Mobile
-    const mobileRegex = /^[6-9]\d{9}$/;
-    if (!formData.mobilenumber) {
-      newErrors.mobilenumber = "Mobile number is required";
-    } else if (!mobileRegex.test(formData.mobilenumber)) {
-      newErrors.mobilenumber =
-        "Mobile must start with 6-9 and be 10 digits";
-    }
-
-    // DOB
-    if (!formData.dateofbirth) {
-      newErrors.dateofbirth = "Date of birth is required";
-    }
-
-    setErrors(newErrors);
-
-    return Object.keys(newErrors).length === 0;
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!validate()) return;
-
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/user-api/user`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/user-api/user`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
 
       const data = await res.json();
 
       if (res.ok) {
-        alert("User added successfully!");
+        showToast("User added successfully 🎉", "success");
 
         setFormData({
           name: "",
@@ -74,96 +52,73 @@ function AddUser() {
           mobilenumber: "",
           dateofbirth: "",
         });
-
-        setErrors({});
       } else {
-        alert("Failed to add user");
+        showToast(data.message || "Failed to add user", "error");
       }
     } catch (error) {
       console.log(error);
-      alert("Server error");
+      showToast("Server error", "error");
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white flex flex-col items-center py-10">
+    <div className="min-h-screen bg-gray-950 text-white flex flex-col items-center py-10 relative">
 
       <h1 className="text-3xl font-bold mb-8">Add User</h1>
 
-      <div className="w-full max-w-md bg-gray-900 border border-gray-800 rounded-xl p-6">
+      {/* 🔥 HOTDOG TOAST */}
+      {toast.show && (
+        <div
+          className={`fixed top-5 right-5 px-5 py-3 rounded-md text-white shadow-lg transition-all duration-300
+          ${toast.type === "success" ? "bg-green-600" : "bg-red-600"}`}
+        >
+          {toast.message}
+        </div>
+      )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-md bg-gray-900 p-6 rounded-xl space-y-4"
+      >
+        <input
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          placeholder="Name"
+          className="w-full p-3 bg-gray-800 rounded-md"
+        />
 
-          {/* Name */}
-          <div>
-            <input
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              placeholder="Name"
-              className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md"
-            />
-            {errors.name && (
-              <p className="text-red-400 text-sm">{errors.name}</p>
-            )}
-          </div>
+        <input
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          placeholder="Email"
+          className="w-full p-3 bg-gray-800 rounded-md"
+        />
 
-          {/* Email */}
-          <div>
-            <input
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Email"
-              className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md"
-            />
-            {errors.email && (
-              <p className="text-red-400 text-sm">{errors.email}</p>
-            )}
-          </div>
+        <input
+          name="mobilenumber"
+          value={formData.mobilenumber}
+          onChange={handleChange}
+          placeholder="Mobile Number"
+          className="w-full p-3 bg-gray-800 rounded-md"
+        />
 
-          {/* Mobile */}
-          <div>
-            <input
-              name="mobilenumber"
-              value={formData.mobilenumber}
-              onChange={handleChange}
-              placeholder="Mobile Number"
-              className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md"
-            />
-            {errors.mobilenumber && (
-              <p className="text-red-400 text-sm">
-                {errors.mobilenumber}
-              </p>
-            )}
-          </div>
+        <input
+          type="date"
+          name="dateofbirth"
+          value={formData.dateofbirth}
+          onChange={handleChange}
+          className="w-full p-3 bg-gray-800 rounded-md"
+        />
 
-          {/* DOB */}
-          <div>
-            <input
-              name="dateofbirth"
-              value={formData.dateofbirth}
-              onChange={handleChange}
-              type="date"
-              className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md"
-            />
-            {errors.dateofbirth && (
-              <p className="text-red-400 text-sm">
-                {errors.dateofbirth}
-              </p>
-            )}
-          </div>
-
-          {/* Submit */}
-          <button
-            type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 py-3 rounded-md font-semibold"
-          >
-            Add User
-          </button>
-
-        </form>
-      </div>
+        <button
+          type="submit"
+          className="w-full bg-blue-600 hover:bg-blue-700 py-3 rounded-md"
+        >
+          Add User
+        </button>
+      </form>
     </div>
   );
 }
