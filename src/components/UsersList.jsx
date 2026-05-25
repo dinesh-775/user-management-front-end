@@ -4,7 +4,7 @@ function UsersList() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 🔥 GET USERS
+  //  GET USERS
   const fetchUsers = async () => {
     try {
       const res = await fetch(
@@ -21,7 +21,7 @@ function UsersList() {
     }
   };
 
-  // 🔥 DELETE USER
+  //  DELETE USER
   const deleteUser = async (id) => {
     try {
       const res = await fetch(
@@ -72,11 +72,11 @@ function UsersList() {
               </h2>
 
               <p className="text-gray-400 text-sm">
-                📧 {user.email}
+                 {user.email}
               </p>
 
               <p className="text-gray-400 text-sm mt-1">
-                📱 {user.mobilenumber}
+                 {user.mobilenumber}
               </p>
 
               <p className="text-gray-500 text-xs mt-1">
